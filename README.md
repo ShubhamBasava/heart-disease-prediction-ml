@@ -1,74 +1,203 @@
-# insurance-claim-prediction-ml
-
-Machine learning project to predict whether a customer will buy an insurance product, built for the PRCP-1010 capstone challenge.
+# Heart Disease Prediction (PRCP-1016)
 
 ## Project Overview
 
-This project focuses on helping an insurance marketing team identify customers who are more likely to purchase the product. The notebook also includes model comparison and a production recommendation based on performance.
+Heart disease remains one of the leading causes of death globally. Early detection and accurate risk prediction can significantly improve patient outcomes and reduce mortality.
 
-## Problem Statement
+This project develops a machine learning classification system to predict the presence of heart disease based on clinical and medical attributes. The goal is to support healthcare professionals with data-driven insights for early diagnosis and intervention.
 
-- Create a predictive model that helps the insurance marketing team know which customer will buy the product.
-- Suggest ways for the insurance marketing team to improve customer conversion.
-- Compare multiple models and recommend the best one for production.
-- Document the challenges faced and the techniques used to handle them.
+**Target Variable:**  
+`heart_disease_present`  
+- `0` → No heart disease  
+- `1` → Heart disease present  
+
+**Primary Objectives:**
+- Perform thorough Exploratory Data Analysis (EDA)
+- Build and compare multiple classification models
+- Select the best-performing model based on clinically relevant metrics
+- Deliver actionable healthcare insights
+
+---
 
 ## Dataset
 
-- Domain: Finance
-- Train set size: 595,212 observations
-- Number of features: 59
+- **Source**: PRCP-1016 Heart Disease Prediction dataset
+- **Files**:
+  - `values.csv` – Clinical features
+  - `labels.csv` – Target labels
+- **Merge Key**: `patient_id`
+- **Final Shape**: 180 patients × 15 columns (after merge)
 
-The dataset features are anonymized, so the project moves directly into modeling.
+### Feature Description
 
-## Key Highlights
+| Feature | Description |
+|---------|-------------|
+| `slope_of_peak_exercise_st_segment` | Slope of the peak exercise ST segment (1–3) |
+| `thal` | Thalassemia status (`normal`, `fixed_defect`, `reversible_defect`) |
+| `resting_blood_pressure` | Resting blood pressure (mm Hg) |
+| `chest_pain_type` | Type of chest pain (1–4) |
+| `num_major_vessels` | Number of major vessels colored by fluoroscopy (0–3) |
+| `fasting_blood_sugar_gt_120_mg_per_dl` | Fasting blood sugar > 120 mg/dl (0/1) |
+| `resting_ekg_results` | Resting electrocardiographic results (0–2) |
+| `serum_cholesterol_mg_per_dl` | Serum cholesterol (mg/dl) |
+| `oldpeak_eq_st_depression` | ST depression induced by exercise relative to rest |
+| `sex` | Sex (0 = female, 1 = male) |
+| `age` | Age in years |
+| `max_heart_rate_achieved` | Maximum heart rate achieved |
+| `exercise_induced_angina` | Exercise-induced angina (0/1) |
+| `heart_disease_present` | Target (0/1) |
 
-- Built inside a single Jupyter notebook as required by the project brief.
-- Compared multiple models for classification performance.
-- Included model selection discussion for production use.
-- Added a challenges-and-techniques report to explain the approach.
+---
 
-## Suggested Tech Stack
+## Project Pipeline
 
-- Python
-- Jupyter Notebook
-- Pandas
-- NumPy
-- Scikit-learn
-- PySpark
-- Matplotlib
-- Seaborn
+1. **Imports & Setup** – Core libraries, visualization, preprocessing, models, and metrics
+2. **Data Loading & Merging** – Download, unzip, and merge `values.csv` + `labels.csv`
+3. **Exploratory Data Analysis (EDA)** – Distributions, correlations, categorical analysis, and target relationships
+4. **Data Preprocessing** – Encoding categorical variables, handling mixed data types, feature scaling
+5. **Train-Test Split** – Stratified split to preserve class balance
+6. **Model Building** – Multiple classification algorithms
+7. **Model Evaluation** – Accuracy, Precision, Recall, F1-Score, ROC-AUC, Confusion Matrix
+8. **Hyperparameter Tuning** – GridSearchCV on key models
+9. **Final Model Selection** – Based on clinical relevance (especially Recall and ROC-AUC)
+10. **Model Persistence** – Saved as `final_heart_model.pkl`
+11. **Healthcare Insights & Recommendations**
 
-## Repository Structure
+---
 
-```text
-insurance-claim-prediction-ml/
-├── README.md
-├── .gitignore
-├── PRCP-1010-InsClaimPred.ipynb
-├── PRCP-1010-InsClaimPred.docx
-└── data/
+## Models Evaluated
+
+| Model                        | Type                     | Notes                                      |
+|-----------------------------|--------------------------|--------------------------------------------|
+| Logistic Regression         | Linear                   | Interpretable baseline                     |
+| Decision Tree               | Tree-based               | Easy to interpret                          |
+| Random Forest               | Ensemble (Bagging)       | Robust performance                         |
+| Gradient Boosting           | Ensemble (Boosting)      | Strong predictive power                    |
+| Support Vector Machine (SVM)| Kernel-based             | Effective in high-dimensional spaces       |
+| K-Nearest Neighbors (KNN)   | Instance-based           | Simple but sensitive to scaling            |
+| **Gaussian Naive Bayes**    | Probabilistic            | **Selected as final model**                |
+| XGBoost                     | Advanced Boosting        | High performance after tuning              |
+
+### Hyperparameter Tuning (GridSearchCV – Scoring: ROC-AUC)
+
+- **Logistic Regression**: `C`, `solver`
+- **Decision Tree**: `max_depth`, `min_samples_split`
+- **Random Forest**: `n_estimators`, `max_depth`, `min_samples_split`
+- **Gradient Boosting**: `n_estimators`, `learning_rate`, `max_depth`
+- **SVM**: `C`, `kernel`
+- **KNN**: `n_neighbors`, `weights`
+- **XGBoost**: `n_estimators`, `max_depth`, `learning_rate`
+- **Naive Bayes**: `var_smoothing`
+
+---
+
+## Final Model Performance
+
+**Selected Model: Gaussian Naive Bayes**
+
+| Metric       | Score     |
+|--------------|-----------|
+| **Accuracy** | 0.8333    |
+| **Precision**| 0.8571    |
+| **Recall**   | 0.7500    |
+| **F1-Score** | 0.8000    |
+| **ROC-AUC**  | **0.9111**|
+
+**Confusion Matrix (Test Set):**
+```
+[[27  3]
+ [ 6 18]]
 ```
 
-## How to Run
+### Why Naive Bayes Was Selected
+- Highest ROC-AUC (0.9111) among evaluated models
+- Strong Recall (0.75) — critical in healthcare to minimize false negatives
+- Balanced overall performance
+- Low model complexity and high stability
+- Fast inference suitable for clinical decision support
 
-1. Clone the repository.
-2. Open the notebook in Jupyter Notebook, JupyterLab, or VS Code.
-3. Install the required libraries.
-4. Run the notebook cells from top to bottom.
+> **Clinical Priority**: In heart disease prediction, **Recall** is often more important than pure accuracy because missing a positive case (false negative) can have severe consequences.
 
-Example:
+---
 
+## Key Healthcare Insights
+
+- Patients with higher **chest pain type** values are at significantly elevated risk.
+- **Exercise-induced angina** is a strong clinical indicator of underlying heart disease.
+- Combination of elevated **serum cholesterol** and high **resting blood pressure** increases disease probability.
+- Features such as `oldpeak` (ST depression), `num_major_vessels`, and `thal` status provide valuable diagnostic signals.
+- Early detection using these clinical markers can substantially reduce mortality risk.
+
+---
+
+## Challenges & Solutions
+
+| Challenge                        | Solution Applied                              |
+|----------------------------------|-----------------------------------------------|
+| Mixed data types (numeric + categorical) | Label / One-hot encoding                     |
+| Different feature scales         | StandardScaler for distance-based models      |
+| Model selection uncertainty      | Systematic comparison of 8 algorithms         |
+| Risk of overfitting              | Cross-validation + GridSearchCV               |
+| Small dataset size (n=180)       | Emphasis on robust metrics (ROC-AUC, Recall)  |
+
+---
+
+## How to Reproduce
+
+### Requirements
 ```bash
-pip install -r requirements.txt
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+xgboost
 ```
 
-## Notes
+### Steps
+1. Open the Jupyter notebook `PRCP-1016-HeartDieseasePred.ipynb`
+2. Run the data download and unzip cells (or place the Data folder manually)
+3. Execute cells sequentially through preprocessing, modeling, tuning, and evaluation
+4. The final model is saved as:
+   ```python
+   pickle.dump(final_model, open("final_heart_model.pkl", "wb"))
+   ```
 
-- The dataset is not included here if it is large or restricted.
-- The repository is structured to keep the main notebook easy to review.
-- Add your final metrics, charts, and model conclusion inside the notebook for a stronger portfolio presentation.
+### Loading the Saved Model
+```python
+import pickle
+
+model = pickle.load(open("final_heart_model.pkl", "rb"))
+predictions = model.predict(X_new)
+probabilities = model.predict_proba(X_new)[:, 1]
+```
+
+---
+
+## Project Structure
+
+```
+├── PRCP-1016-HeartDieseasePred.ipynb   # Main analysis notebook
+├── final_heart_model.pkl               # Trained Naive Bayes model
+├── Data/
+│   ├── values.csv                      # Clinical features
+│   ├── labels.csv                      # Target labels
+│   └── description.docx                # Feature documentation
+└── README_HeartDisease.md              # This file
+```
+
+---
 
 ## Conclusion
 
-This project demonstrates an end-to-end workflow for a real-world insurance prediction task, with model comparison, production recommendation, and clear documentation.
+This project successfully demonstrates an end-to-end machine learning workflow for heart disease prediction. Through careful data preparation, multi-model comparison, and clinically oriented evaluation, **Gaussian Naive Bayes** emerged as the best model with a strong ROC-AUC of **0.911** and solid recall.
+
+The resulting system can serve as a decision-support tool to assist healthcare professionals in identifying high-risk patients earlier, enabling timely intervention and potentially saving lives.
+
+---
+
+**Project Code**: PRCP-1016  
+**Domain**: Healthcare / Cardiology  
+**Task Type**: Binary Classification  
+**Final Model**: Gaussian Naive Bayes  
+**Key Metric**: ROC-AUC = 0.9111
