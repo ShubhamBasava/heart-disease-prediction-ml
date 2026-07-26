@@ -47,9 +47,7 @@ insurance-claim-prediction-ml/
 ├── .gitignore
 ├── PRCP-1010-InsClaimPred.ipynb
 ├── PRCP-1010-InsClaimPred.docx
-├── data/
-├── models/
-└── results/
+└── data/
 ```
 
 ## How to Run
