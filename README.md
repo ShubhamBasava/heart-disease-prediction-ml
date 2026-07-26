@@ -183,7 +183,7 @@ probabilities = model.predict_proba(X_new)[:, 1]
 │   ├── values.csv                      # Clinical features
 │   ├── labels.csv                      # Target labels
 │   └── description.docx                # Feature documentation
-└── README_HeartDisease.md              # This file
+└── README.md              # This file
 ```
 
 ---
