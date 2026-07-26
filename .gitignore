@@ -1,0 +1,12 @@
+models/
+results/
+
+*.zip
+*.csv
+*.pkl
+*.parquet
+
+.ipynb_checkpoints/
+__pycache__/
+.vscode/
+.env
